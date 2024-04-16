@@ -31,19 +31,19 @@ def symlink(source: str, target: str, force: bool = False) -> None:
     if not source or not target:
         raise ValueError("Source and target must be non-empty strings")
 
-    source = os.path.abspath(source)
-    target = os.path.abspath(target)
+    source: str = os.path.abspath(source)
+    target: str = os.path.abspath(target)
 
     if not os.path.exists(source):
         raise FileNotFoundError(f"Source file does not exist: {source}")
 
-    target_dir = os.path.dirname(target)
+    target_dir: str = os.path.dirname(target)
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
         logger.info(f"Created missing directory: {target_dir}")
 
     if os.path.lexists(target):
-        current_target = os.readlink(target) if os.path.islink(target) else None
+        current_target: str | None = os.readlink(target) if os.path.islink(target) else None
         if current_target != source:
             if force:
                 os.unlink(target)

@@ -1,13 +1,20 @@
-.PHONY: install test coverage publish
+.PHONY: install test coverage publish clean
 
 install:
-	poetry install --no-dev --no-interaction
+	@poetry install --no-root --no-interaction
+
+clean:
+	@find . -type f -name '*.pyc' -delete
+	@find . -type d -name '__pycache__' -delete
+	@rm -rf .pytest_cache
+	@rm -f coverage.xml
+	@rm -rf dist
 
 test:
-	poetry run pytest -vv
+	@poetry run pytest -vv
 
 coverage:
-	poetry run pytest -vv --cov=symply tests/ --cov-report xml --cov-report term
+	@poetry run pytest --cov=symply --cov=watcher --cov-report term --cov-report xml
 
 publish:
-	poetry publish --build
+	@poetry publish --build
