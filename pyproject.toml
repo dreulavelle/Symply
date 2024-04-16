@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "symply"
+version = "0.1.0"
+description = "Effortless Symlink Management as a Python Package!"
+authors = ["Spoked <dreu.lavelle@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+watchdog = "^4.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pyfakefs = "^5.4.1"
+pytest-cov = "^5.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+symply-cli = "symply.cli.cli:main"
