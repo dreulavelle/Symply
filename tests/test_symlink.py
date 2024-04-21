@@ -40,7 +40,7 @@ def test_overwrite_existing_symlink():
         # Try to create a new symlink where one already exists without force
         with pytest.raises(FileExistsError):
             symlink(source_new, target, force=False)
-        
+
         # Now try with force=True, which should overwrite the existing symlink
         symlink(source_new, target, force=True)
 
@@ -121,7 +121,7 @@ def test_delete_when_target_is_regular_file():
         assert patcher.fs.exists(target)  # File should still exist
 
 def test_symlink_with_invalid_paths():
-    with Patcher() as patcher:
+    with Patcher():
         source = "/invalid/??source.txt"
         target = "/invalid/??target_link.txt"
         

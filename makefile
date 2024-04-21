@@ -11,10 +11,10 @@ clean:
 	@rm -rf dist
 
 test:
-	@poetry run pytest -vv
+	@poetry run pytest -vv -s
 
 coverage:
-	@poetry run pytest --cov=symply --cov=watcher --cov-report term --cov-report xml
+	@poetry run pytest -vv --cov=symply --cov=watcher --cov-report term --cov-report xml
 
 publish:
 	@poetry publish --build

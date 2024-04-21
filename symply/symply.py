@@ -1,3 +1,25 @@
+"""
+Symply is a simple Python module for creating and managing symlinks.
+
+The `symlink` function creates a symlink from a source file to a target path. It can optionally overwrite an existing symlink if the `force` parameter is set to True.
+
+Example:
+    >>> symlink("/path/to/source.txt", "/path/to/target_link.txt", force=True)
+
+The `delete_symlink` function deletes a symlink if it exists.
+
+Example:
+    >>> delete_symlink("/path/to/target_link.txt")
+
+The module also provides a `SymlinkMonitor` class for advanced monitoring of directories and handling events using a custom event handler.
+
+Example:
+    >>> handler = SymlinkHandler(handle_event)
+    >>> monitor = SymlinkMonitor('/path/to/directory', handler, include_patterns=['*.txt', '*.docx'])
+    >>> monitor.start()
+
+For more information, see the documentation for each function and class.
+"""
 import logging
 import os
 

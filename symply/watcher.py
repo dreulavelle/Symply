@@ -4,9 +4,17 @@ Enhanced monitoring module for directory changes and symlink management.
 This module provides advanced monitoring capabilities for directories, handling events like creations, deletions, and modifications. It supports filtering events and customizable callbacks for various events.
 
 Example:
-    handler = SymlinkHandler(handle_event)
-    monitor = SymlinkMonitor('/path/to/directory', handler, include_patterns=['*.txt', '*.docx'])
-    monitor.start()
+    >>> handler = SymlinkHandler(handle_event)
+    >>> monitor = SymlinkMonitor('/path/to/directory', handler, include_patterns=['*.txt', '*.docx'])
+    >>> monitor.start()
+
+The `SymlinkMonitor` class allows you to monitor a directory for changes and handle events using a custom event handler. The `SymlinkHandler` class provides a custom event handler for managing symlink-related events and more.
+
+Attributes:
+- `watch_directory` (str): The path to the directory being monitored.
+- `event_handler` (FileSystemEventHandler): The event handler used for managing events.
+- `observer` (Observer): The observer instance used for monitoring.
+- `thread` (Thread): The thread used to run the observer.
 """
 import logging
 import threading
