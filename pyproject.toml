@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "symply"
-version = "0.1.1"
+version = "0.1.2"
 description = "Effortless Symlink Management as a Python Package!"
 authors = ["Spoked <dreu.lavelle@gmail.com>"]
 license = "MIT"

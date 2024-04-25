@@ -4,6 +4,7 @@ from pyfakefs.fake_filesystem_unittest import Patcher
 
 from symply import symlink, delete_symlink
 
+
 def test_symlink_creation():
     with Patcher() as patcher:
         # Setup a fake file system

@@ -26,7 +26,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-def symlink(source: str, target: str, force: bool = False) -> None:
+def symlink(source: str, target: str, force: bool = False) -> bool:
     """
     Create a symlink from source to target. Optionally, overwrite any existing symlink if `force` is True.
 
@@ -38,70 +38,71 @@ def symlink(source: str, target: str, force: bool = False) -> None:
     Raises:
         TypeError: If any of the parameters are not of the expected type.
         ValueError: If source or target is an empty string.
-        FileNotFoundError: If the source file or target directory does not exist.
-        FileExistsError: If the symlink already exists and points to a different source, and force is False.
+        FileNotFoundError: If the source file does not exist.
+        FileExistsError: If the target already exists and force is not True.
         Exception: If the symlink creation fails for other reasons.
 
     Returns:
-        None: A successful operation is indicated by the function completing without raising an exception.
+        bool: True if the symlink was created successfully, otherwise False.
     """
-    if not isinstance(source, str) or not isinstance(target, str):
+    if not (isinstance(source, str) and isinstance(target, str)):
         raise TypeError("Source and target must be strings")
     if not isinstance(force, bool):
         raise TypeError("Force must be a boolean")
-
     if not source or not target:
         raise ValueError("Source and target must be non-empty strings")
 
-    source: str = os.path.abspath(source)
-    target: str = os.path.abspath(target)
+    source = os.path.abspath(source)
+    target = os.path.abspath(target)
 
     if not os.path.exists(source):
-        raise FileNotFoundError(f"Source file does not exist: {source}")
+        raise FileNotFoundError(f"Source file or directory does not exist: {source}")
 
-    target_dir: str = os.path.dirname(target)
+    target_dir = os.path.dirname(target)
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
         logger.info(f"Created missing directory: {target_dir}")
 
     if os.path.lexists(target):
-        current_target: str | None = os.readlink(target) if os.path.islink(target) else None
-        if current_target != source:
-            if force:
-                os.unlink(target)
-                logger.info(f"Removed existing link: {target}")
+        if os.path.islink(target):
+            current_target = os.path.realpath(target)
+            if current_target != source:
+                if force:
+                    os.unlink(target)
+                    logger.info(f"Removed existing link: {target}")
+                else:
+                    raise FileExistsError(f"Symlink exists and points to a different source: {current_target}")
+        elif force:
+            if os.path.isfile(target) or os.path.isdir(target):
+                os.remove(target)
+                logger.info(f"Removed existing file or directory: {target}")
             else:
-                raise FileExistsError(
-                    f"Symlink already exists and points to a different source: {current_target}"
-                )
+                raise FileExistsError(f"File or directory exists and is not a symlink: {target}")
+        else:
+            raise FileExistsError(f"File or directory exists and is not a symlink: {target}")
 
-    if not os.path.exists(target):
-        os.symlink(source, target)
-        logger.info(f"Symlink created: {target} -> {source}")
-    else:
-        logger.info(f"Symlink points correctly: {target} -> {source}")
-
-    if not os.path.islink(target) or os.readlink(target) != source:
+    os.symlink(source, target)
+    if not os.path.islink(target) or os.path.realpath(target) != source:
         raise Exception("Failed to create or validate the symlink")
 
+    logger.info(f"Symlink created: {target} -> {source}")
+    return True
 
-def delete_symlink(target):
-    """Deletes a symlink if it exists.
 
-    Args:
-        target (str): The path to the symlink to delete.
-
-    Returns:
-        bool: True if the symlink was successfully deleted, False otherwise.
-    """
-    try:
-        if os.path.islink(target):
-            os.unlink(target)
-            logger.info(f"Symlink deleted: {target}")
-            return True
-        else:
-            logger.error(f"No symlink found at {target}")
-            return False
-    except OSError as e:
-        logger.error(f"Failed to delete symlink: {e}")
+def delete_symlink(target, remove_source=False) -> bool:
+    """Remove a symlink at the specified target path and optionally remove the source file or directory."""
+    if not os.path.islink(target):
         return False
+
+    source = os.path.realpath(target)
+    os.unlink(target)
+    logger.info(f"Deleted symlink: {target}")
+
+    if remove_source:
+        if os.path.isfile(source):
+            os.remove(source)
+            logger.info(f"Deleted source file: {source}")
+        elif os.path.isdir(source):
+            os.rmdir(source)
+            logger.info(f"Deleted source directory: {source}")
+    return True
